@@ -13,29 +13,33 @@ const crop = "C"
 const water = "W"
 const tool = "T"
 const empty = "."
+const emptiness = "E"
 const grass = "G"
 var crops = 0
 let wheat = "Wheat: "
 var showText = true
+var grasses = 1
+var pos_x = Math.floor(Math.random() * 10);
+var pos_y = Math.floor(Math.random() * 10);
 
 setLegend(
   [ player, bitmap`
-1.11............
-..11............
-.....1..........
-......1.........
+.LL.............
+.LL.LL..........
+....LL..........
 .......1........
-.4444441........
-.4777741........
-.4777741........
-.4777741........
-.444444444444...
-.444444444444...
-.400004444444...
-.400004444444...
-.400004444004...
-..0000....00....
-................` ],
+........1.......
+........1.......
+.1......1.......
+.1...1..1.......
+D1..11111.......
+4DDDDDD444444444
+344444DDDDDD4666
+30000044444DDD66
+3000004444444444
+4000004444440004
+4000004444440004
+.00000......000.` ],
   [ crop, bitmap`
 ................
 ........6..F..6.
@@ -103,10 +107,27 @@ setLegend(
 ....D.4.D.......
 .....4D4........
 ................
+................` ],
+  [ emptiness, bitmap`
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
+................
 ................` ]
 )
 
-setSolids([player, crop, water, grass])
+setSolids([player, water, grass])
 
 const grid = [
   [player, empty, empty, crop, crop],
@@ -117,51 +138,116 @@ const grid = [
 ]
 
 setMap(map`
-P.......W..
-........W..
-.CG.....W..
-.CCC....W..
-.CGG....W..
-.GC.....W..
-........W..
-........W..
-........W..
-........W..
+...........
+...........
+...........
+...........
+...........
+....P......
+...........
+...........
+...........
+...........
 ...........
 ...........`)
 
-if (showText == true) {
-  addText("WSAD to move", {x: 3, y: 11})
+
+
+for(let i = 0; i < 20; i++){
+    addSprite(Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), "C")
+    addSprite(Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), "G")
 }
 
 onInput("w", () => {
-  const players = getFirst(player)
-  const destinationTile = getTile(player.x, player.y - 1)
+    const player = getFirst("P");
+    const destinationTile = getTile(player.x, player.y - 1);
 
-  // Check if the destination tile contains any solid sprites
-  if (destinationTile.some(sprite => setSolids.includes(sprite.type))) {
-    crops = crops + 1
-  } else {
-    // No collision, move the player up
-    players.y -= 1
-  }
-})
+    console.log("Sprites on Destination Tile:", destinationTile);
+
+    const wheatSprites = destinationTile.filter(sprite => sprite.type === "C");
+
+    if (wheatSprites.length > 0) {
+        console.log("Wheat sprite found! Changing sprite type...");
+
+        wheatSprites.forEach(wheatSprite => {
+            wheatSprite.type = "E";
+          crops = crops + 1;
+        });
+
+        console.log("Wheat sprite type changed.");
+    }
+
+    player.y -= 1;
+});
+
+
 
 onInput("a", () => {
-  getFirst(player).x -= 1
-})
+    const player = getFirst("P");
+    const destinationTile = getTile(player.x - 1, player.y);
+
+    console.log("Sprites on Destination Tile:", destinationTile);
+
+    const wheatSprites = destinationTile.filter(sprite => sprite.type === "C");
+
+    if (wheatSprites.length > 0) {
+        console.log("Wheat sprite found! Changing sprite type...");
+
+        wheatSprites.forEach(wheatSprite => {
+            wheatSprite.type = "E";
+          crops = crops + 1;
+        });
+
+        console.log("Wheat sprite type changed.");
+    }
+
+    player.x -= 1;
+});
 
 onInput("s", () => {
-  getFirst(player).y += 1
-})
+    const player = getFirst("P");
+    const destinationTile = getTile(player.x, player.y + 1);
+
+    console.log("Sprites on Destination Tile:", destinationTile);
+
+    const wheatSprites = destinationTile.filter(sprite => sprite.type === "C");
+
+    if (wheatSprites.length > 0) {
+        console.log("Wheat sprite found! Changing sprite type...");
+
+        wheatSprites.forEach(wheatSprite => {
+            wheatSprite.type = "E";
+          crops = crops + 1;
+        });
+
+        console.log("Wheat sprite type changed.");
+    }
+
+    player.y += 1;
+});
 
 onInput("d", () => {
-  getFirst(player).x += 1
-})
+    const player = getFirst("P");
+    const destinationTile = getTile(player.x + 1, player.y);
+
+    console.log("Sprites on Destination Tile:", destinationTile);
+
+    const wheatSprites = destinationTile.filter(sprite => sprite.type === "C");
+
+    if (wheatSprites.length > 0) {
+        console.log("Wheat sprite found! Changing sprite type...");
+
+        wheatSprites.forEach(wheatSprite => {
+            wheatSprite.type = "E";
+            crops = crops + 1;
+        });
+
+        console.log("Wheat sprite type changed.");
+    }
+
+    player.x += 1;
+});
 
 afterInput(() => {
-  getAll("WSAD to move").forEach(text => {
-    text.visible = false; // Hide the text element
-  })
   addText(wheat.concat(crops.toString()), {x: 3, y: 15, family: "Arial"})
 })
