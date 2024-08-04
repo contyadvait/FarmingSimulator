@@ -18,10 +18,11 @@ const grass = "G"
 var crops = 0
 let wheat = "Wheat: "
 var showText = true
-var grasses = 1
-var pos_x = Math.floor(Math.random() * 10);
-var pos_y = Math.floor(Math.random() * 10);
-
+let timer = 1
+let timerT = "Timer: "
+var playing = false
+var timerStart = false
+var timerText = ""
 setLegend(
   [ player, bitmap`
 .LL.............
@@ -127,7 +128,8 @@ D1..11111.......
 ................` ]
 )
 
-setSolids([player, water, grass])
+setSolids([player, water, grass, tool])
+setPushables({[water]: [player]})
 
 const grid = [
   [player, empty, empty, crop, crop],
@@ -137,21 +139,38 @@ const grid = [
   [empty, empty, empty, empty, empty]
 ]
 
-setMap(map`
-...........
-...........
-...........
-...........
-...........
-....P......
-...........
-...........
-...........
-...........
-...........
-...........`)
+const level1 = map`
+...........W
+.P.........W
+...........W
+...........W
+...........W
+...........W
+...........W
+...........W
+...........W
+...........W
+...........W
+...........W`
+const endScreen = map`
+.......
+.......
+WWCPCWW
+.......
+.......
+.......`
 
+setMap(level1)
 
+function startTimer() {
+  if (timer != 0) {
+    timer -= 1
+    timerText = timerT.concat(timer.toString())
+  } else {
+  setMap(endScreen)
+    addText("Game over!", { x: 5, y:3 , family: "Arial" });
+  }
+}
 
 for(let i = 0; i < 20; i++){
     addSprite(Math.floor(Math.random() * 10), Math.floor(Math.random() * 10), "C")
@@ -249,5 +268,16 @@ onInput("d", () => {
 });
 
 afterInput(() => {
-  addText(wheat.concat(crops.toString()), {x: 3, y: 15, family: "Arial"})
-})
+  if (timerStart == false) {
+    setInterval(startTimer, 1000)
+    timerStart = true
+  }
+  addText(timerText, { x: 3, y: 13, family: "Arial" });
+  if (timer != 0) {
+    timerText = timerT.concat(timer.toString())
+    addText(wheat.concat(crops.toString()), { x: 3, y: 15, family: "Arial" });
+  } else {
+    timerText = ""
+    addText("", { x: 3, y: 13, family: "Arial" });
+  }
+});
